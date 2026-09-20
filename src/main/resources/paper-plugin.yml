@@ -1,0 +1,9 @@
+name: MvndiTownRating
+version: '${version}'
+main: com.nenfal.MvndiTownRating
+api-version: '1.21'
+dependencies:
+  server:
+    MvndiCore:
+      load: BEFORE
+      required: true
