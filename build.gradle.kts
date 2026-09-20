@@ -20,6 +20,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:$apiVersion-R0.1-SNAPSHOT")
     compileOnly("com.github.TownyAdvanced.towny:towny:0.101.2.0")
+    implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
