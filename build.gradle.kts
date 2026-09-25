@@ -22,6 +22,7 @@ dependencies {
     compileOnly("com.github.TownyAdvanced.towny:towny:0.101.2.0")
     compileOnly("net.mvndicraft:mvndicore:2.0.0-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
+    implementation("org.mongodb:mongodb-driver-sync:5.12.0")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

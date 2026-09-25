@@ -5,16 +5,25 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import com.nenfal.database.TownRatingDAO;
 import com.palmergames.bukkit.towny.TownyAPI;
 import org.bukkit.command.CommandSender;
+
+import java.math.BigDecimal;
 
 @CommandAlias("townrating | tr")
 public class TownRatingCommand extends BaseCommand {
 
+    private final TownRatingDAO townRatingDAO;
+
+    public TownRatingCommand(TownRatingDAO townRatingDAO) {
+        this.townRatingDAO = townRatingDAO;
+    }
+
     private static final String PREFIX = "&#f1c40f&lᴛᴏᴡɴʀᴀᴛɪɴɢ &7&l» &r";
 
-    public boolean ensureTownExists(CommandSender sender, String town) {
-        com.palmergames.bukkit.towny.object.Town townObj = TownyAPI.getInstance().getTown(town);
+    public boolean ensureTownExists(CommandSender sender, String townName) {
+        com.palmergames.bukkit.towny.object.Town townObj = TownyAPI.getInstance().getTown(townName);
         if (townObj == null) {
             sender.sendMessage(PREFIX + "&cTown not found &#c0392b✘");
             return false;
@@ -34,10 +43,12 @@ public class TownRatingCommand extends BaseCommand {
 
     @CommandPermission("mvndi.townrating.add")
     @Subcommand("add")
-    public void onAdd(CommandSender sender, String town, int value) {
-        if (!ensureTownExists(sender, town)) {
+    public void onAdd(CommandSender sender, String townName, BigDecimal townRate) {
+        if (!ensureTownExists(sender, townName)) {
             return;
         }
+        townRatingDAO.saveRating(townName, townRate);
+
         sender.sendMessage(PREFIX + "&aRating added to town &#2ecc71✔");
 
     }
