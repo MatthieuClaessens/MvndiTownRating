@@ -1,10 +1,11 @@
 plugins {
     `java-library`
     `maven-publish`
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.nenfal"
-version = "1.0-SNAPSHOT"
+version = "1.0.0-SNAPSHOT"
 val apiVersion = "1.21.11"
 description = "MvndiTownRating"
 java.sourceCompatibility = JavaVersion.VERSION_21
@@ -21,8 +22,10 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:$apiVersion-R0.1-SNAPSHOT")
     compileOnly("com.github.TownyAdvanced.towny:towny:0.101.2.0")
     compileOnly("net.mvndicraft:mvndicore:2.0.0-SNAPSHOT")
+    compileOnly("org.mongodb:mongodb-driver-sync:5.12.0")
+
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
-    implementation("org.mongodb:mongodb-driver-sync:5.12.0")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -38,6 +41,17 @@ tasks.withType<Javadoc> {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    dependencies {
+        exclude(dependency("org.mongodb:.*"))
+    }
+}
+
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
 
 tasks {

@@ -1,17 +1,16 @@
 package com.nenfal.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import com.nenfal.database.TownRatingDAO;
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.object.Resident;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 
-@CommandAlias("townrating | tr")
+@CommandAlias("townrating|tr")
 public class TownRatingCommand extends BaseCommand {
 
     private final TownRatingDAO townRatingDAO;
@@ -20,25 +19,32 @@ public class TownRatingCommand extends BaseCommand {
         this.townRatingDAO = townRatingDAO;
     }
 
-    private static final String PREFIX = "§#f1c40f§lᴛᴏᴡɴʀᴀᴛɪɴɢ §7§l» §r";
+    private static final String PREFIX = "§6§lᴛᴏᴡɴʀᴀᴛɪɴɢ §8§l» §r";
 
     public boolean ensureTownExists(CommandSender sender, String townName) {
         com.palmergames.bukkit.towny.object.Town townObj = TownyAPI.getInstance().getTown(townName);
         if (townObj == null) {
-            sender.sendMessage(PREFIX + "§cTown not found §#c0392b✘");
+            sender.sendMessage(PREFIX + "§cTown not found §4✘");
             return false;
         }
-        sender.sendMessage(PREFIX + "§aTown §e" + townObj.getName() + " §afound! §#2ecc71✔");
         return true;
     }
 
     @Default
-    @Subcommand("help | h")
     public void onDefault(CommandSender sender) {
-        sender.sendMessage("§8§l«« §6§lᴍᴠɴᴅɪ §#f1c40f§lᴛᴏᴡɴʀᴀᴛɪɴɢ §8§l»»");
-        sender.sendMessage("§6● §#f1c40f/ᴛᴏᴡɴʀᴀᴛɪɴɢ ᴀᴅᴅ <ᴛᴏᴡɴ> <ᴠᴀʟᴜᴇ> §7: ᴀᴅᴅ ʀᴀᴛɪɴɢ ᴛᴏ ᴀ ᴛᴏᴡɴ");
-        sender.sendMessage("§6● §#f1c40f/ᴛᴏᴡɴʀᴀᴛɪɴɢ info <ᴛᴏᴡɴ> §7: ɢᴇᴛ ʀᴀᴛɪɴɢ ᴏꜰ ᴀ ᴛᴏᴡɴ");
-        sender.sendMessage("§6● §#f1c40f/ᴛᴏᴡɴʀᴀᴛɪɴɢ remove <ᴛᴏᴡɴ> §7: ʀᴇᴍᴏᴠᴇ ʀᴀᴛɪɴɢ ꜰʀᴏᴍ ᴀ ᴛᴏᴡɴ");
+        sendHelp(sender);
+    }
+
+    @Subcommand("help|h")
+    public void onHelp(CommandSender sender) {
+        sendHelp(sender);
+    }
+
+    private void sendHelp(CommandSender sender) {
+        sender.sendMessage("§7§l« §a§lTOWNRATING §7§l»");
+        sender.sendMessage("§6● §6/townrating add <town> <value> §e: add rating to a town");
+        sender.sendMessage("§6● §6/townrating info <town> §e: get rating of a town");
+        sender.sendMessage("§6● §6/townrating remove <town> §e: remove rating from a town");
     }
 
     @CommandPermission("mvndi.townrating.add")
@@ -47,30 +53,60 @@ public class TownRatingCommand extends BaseCommand {
         if (!ensureTownExists(sender, townName)) {
             return;
         }
-        townRatingDAO.saveRating(townName, townRate);
 
-        sender.sendMessage(PREFIX + "§aRating added to town §#2ecc71✔");
+        if (townRate.compareTo(BigDecimal.ZERO) < 0 || townRate.compareTo(BigDecimal.ONE) > 0) {
+            sender.sendMessage(PREFIX + "§cError: Rating must be between 0 and 1");
+            return;
+        }
 
+        try {
+            townRatingDAO.saveRating(townName, townRate);
+            sender.sendMessage(PREFIX + "§aRating added to town §2✔");
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage(PREFIX + "§c" + e.getMessage());
+        }
     }
 
     @CommandPermission("mvndi.townrating.info")
-    @Subcommand("info | i")
-    public void onGetRating(CommandSender sender, String townName) {
+    @Subcommand("info|i")
+    public void onGetRating(CommandSender sender, @Optional String townName) {
+        if (townName == null || townName.isEmpty()) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(PREFIX + "§cConsole must specify a town name!");
+                return;
+            }
+
+            Player player = (Player) sender;
+            Resident resident = TownyAPI.getInstance().getResident(player);
+
+            if (resident == null || !resident.hasTown()) {
+                sender.sendMessage(PREFIX + "§cYou are not a member of any town!");
+                return;
+            }
+
+            try {
+                townName = resident.getTown().getName();
+            } catch (Exception e) {
+                sender.sendMessage(PREFIX + "§cCould not find your town.");
+                return;
+            }
+        }
+
         if (!ensureTownExists(sender, townName)) {
             return;
         }
+
         BigDecimal rating = townRatingDAO.getRating(townName);
-        sender.sendMessage(PREFIX + "§aRating for town §e" + townName + " §ais: §e" + rating);
+        sender.sendMessage(PREFIX + "§aRating for town §e" + townName + " §ais §e" + rating);
     }
 
     @CommandPermission("mvndi.townrating.remove")
-    @Subcommand("remove | r")
+    @Subcommand("remove|r")
     public void onRemoveRating(CommandSender sender, String townName) {
         if (!ensureTownExists(sender, townName)) {
             return;
         }
-        BigDecimal rating = townRatingDAO.getRating(townName);
         townRatingDAO.removeRating(townName);
-        sender.sendMessage(PREFIX + "§aSuccessfully removed §e" + townName);
+        sender.sendMessage(PREFIX + "§aSuccessfully removed rating for §e" + townName);
     }
 }

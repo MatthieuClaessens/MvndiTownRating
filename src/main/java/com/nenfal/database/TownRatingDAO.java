@@ -1,6 +1,7 @@
 package com.nenfal.database;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
@@ -11,9 +12,14 @@ import org.bson.Document;
 import java.math.BigDecimal;
 
 public class TownRatingDAO {
-
+    private final MongoDatabase database;
     private boolean databaseConnected = false;
     private MongoCollection<Document> townRatings;
+
+    public TownRatingDAO(MongoDatabase database) {
+        this.database = database;
+        initDatabase();
+    }
 
     void initDatabase() {
         MvndiDatabases dbs = MvndiCore.getInstance().getDatabases();
@@ -29,6 +35,12 @@ public class TownRatingDAO {
     }
 
     public void saveRating(String townName, BigDecimal townRate) {
+        if (!databaseConnected || townRatings == null) return;
+
+        if (townRate.compareTo(BigDecimal.ZERO) < 0 || townRate.compareTo(BigDecimal.ONE) > 0) {
+            throw new IllegalArgumentException("Rating must be between 0 and 1");
+        }
+
         Document query = new Document("Town Name", townName);
         Document update = new Document("$set", new Document("Town Name", townName)
                 .append("Town rate", townRate.doubleValue()));
@@ -48,6 +60,7 @@ public class TownRatingDAO {
     }
 
     public void removeRating(String townName) {
+        if (!databaseConnected || townRatings == null) return;
         townRatings.deleteOne(new Document("Town Name", townName));
     }
 }

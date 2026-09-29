@@ -4,6 +4,9 @@ main: com.nenfal.MvndiTownRating
 api-version: '1.21'
 dependencies:
   server:
+    Towny:
+      load: BEFORE
+      required: true
     MvndiCore:
       load: BEFORE
       required: true
