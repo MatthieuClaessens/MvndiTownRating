@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 
-@CommandAlias("townrating|tr")
+@CommandAlias("townrating|trating")
 public class TownRatingCommand extends BaseCommand {
 
     private final TownRatingDAO townRatingDAO;
@@ -45,17 +45,17 @@ public class TownRatingCommand extends BaseCommand {
         if (sender.hasPermission("mvndi.townrating.info")) {
             sender.sendMessage("§6● §6/townrating info [town] §e: get rating of a town");
         }
-        if (sender.hasPermission("mvndi.townrating.add")) {
-            sender.sendMessage("§6● §6/townrating add <town> <value> §e: add rating to a town");
+        if (sender.hasPermission("mvndi.townrating.set")) {
+            sender.sendMessage("§6● §6/townrating set <town> <value> §e: set rating to a town");
         }
         if (sender.hasPermission("mvndi.townrating.remove")) {
             sender.sendMessage("§6● §6/townrating remove <town> §e: remove rating from a town");
         }
     }
 
-    @CommandPermission("mvndi.townrating.add")
-    @Subcommand("add")
-    public void onAdd(CommandSender sender, String townName, BigDecimal townRate) {
+    @CommandPermission("mvndi.townrating.set")
+    @Subcommand("set")
+    public void onSet(CommandSender sender, String townName, BigDecimal townRate) {
         if (!ensureTownExists(sender, townName)) {
             return;
         }
@@ -67,7 +67,7 @@ public class TownRatingCommand extends BaseCommand {
 
         try {
             townRatingDAO.saveRating(townName, townRate);
-            sender.sendMessage(PREFIX + "§aRating added to town §2✔");
+            sender.sendMessage(PREFIX + "§aRating §e" + townRate + " §aset to town §e" + townName + " §2✔");
         } catch (IllegalArgumentException e) {
             sender.sendMessage(PREFIX + "§c" + e.getMessage());
         }
@@ -113,6 +113,6 @@ public class TownRatingCommand extends BaseCommand {
             return;
         }
         townRatingDAO.removeRating(townName);
-        sender.sendMessage(PREFIX + "§aSuccessfully removed rating for §e" + townName);
+        sender.sendMessage(PREFIX + "§aSuccessfully removed rating for §e" + townName + " §2✔");
     }
 }

@@ -10,3 +10,4 @@ dependencies:
     MvndiCore:
       load: BEFORE
       required: true
+      join-classpath: true
