@@ -8,7 +8,12 @@ group = "com.nenfal"
 version = "1.0.0-SNAPSHOT"
 val apiVersion = "1.21.11"
 description = "MvndiTownRating"
-java.sourceCompatibility = JavaVersion.VERSION_21
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
 
 repositories {
     mavenLocal()
