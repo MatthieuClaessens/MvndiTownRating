@@ -44,6 +44,7 @@ tasks.test {
 }
 
 tasks.shadowJar {
+    relocate("co.aikar.commands", "com.nenfal.utils.acf")
     archiveClassifier.set("")
     dependencies {
         exclude(dependency("org.mongodb:.*"))
