@@ -42,9 +42,15 @@ public class TownRatingCommand extends BaseCommand {
 
     private void sendHelp(CommandSender sender) {
         sender.sendMessage("§7§l« §a§lTOWNRATING §7§l»");
-        sender.sendMessage("§6● §6/townrating add <town> <value> §e: add rating to a town");
-        sender.sendMessage("§6● §6/townrating info <town> §e: get rating of a town");
-        sender.sendMessage("§6● §6/townrating remove <town> §e: remove rating from a town");
+        if (sender.hasPermission("mvndi.townrating.info")) {
+            sender.sendMessage("§6● §6/townrating info [town] §e: get rating of a town");
+        }
+        if (sender.hasPermission("mvndi.townrating.add")) {
+            sender.sendMessage("§6● §6/townrating add <town> <value> §e: add rating to a town");
+        }
+        if (sender.hasPermission("mvndi.townrating.remove")) {
+            sender.sendMessage("§6● §6/townrating remove <town> §e: remove rating from a town");
+        }
     }
 
     @CommandPermission("mvndi.townrating.add")
