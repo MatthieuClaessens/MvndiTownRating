@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 
-@CommandAlias("townrating|trating")
+@CommandAlias("mtr")
 public class TownRatingCommand extends BaseCommand {
 
     private final TownRatingDAO townRatingDAO;
@@ -43,13 +43,13 @@ public class TownRatingCommand extends BaseCommand {
     private void sendHelp(CommandSender sender) {
         sender.sendMessage("§7§l« §a§lTOWNRATING §7§l»");
         if (sender.hasPermission("mvndi.townrating.info")) {
-            sender.sendMessage("§6● §6/townrating info [town] §e: get rating of a town");
+            sender.sendMessage("§6● §6/mtr info [town] §e: get rating of a town");
         }
         if (sender.hasPermission("mvndi.townrating.set")) {
-            sender.sendMessage("§6● §6/townrating set <town> <value> §e: set rating to a town");
+            sender.sendMessage("§6● §6/mtr set <town> <value> §e: set rating to a town");
         }
         if (sender.hasPermission("mvndi.townrating.remove")) {
-            sender.sendMessage("§6● §6/townrating remove <town> §e: remove rating from a town");
+            sender.sendMessage("§6● §6/mtr remove <town> §e: remove rating from a town");
         }
     }
 
